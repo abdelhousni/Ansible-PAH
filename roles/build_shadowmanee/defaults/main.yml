@@ -1,13 +1,13 @@
 ---
 ee_version: 3
 dest_dir: /home/ansible/ansible/builder/shadowmanee/
-pah_name: tower.shadowman.dev
+pah_name: aap.shadowman.dev
 image_name: shadowmanee
 dev_image_name: devee
 bindep_file: bindep.txt
 python_requirements_file: requirements.txt
 galaxy_requirements_file: requirements.yml
-ee_base_image: tower.shadowman.dev/ansible-automation-platform/ee-minimal-rhel8:2.16
+ee_base_image: aap.shadowman.dev/ansible-automation-platform/ee-minimal-rhel8:2.16
 ee_base_sig_name: registry.redhat.io/ansible-automation-platform/ee-minimal-rhel8:2.16
 repository: shadowman
 # ee_builder_image: towerpah.shadowman.dev/ansible-automation-platform-23/ansible-builder-rhel8:latest
@@ -31,7 +31,7 @@ ee_build_files:
 ee_bindep:
   - python3-jinja2 [platform:rpm]
   - which [platform:rpm]
-  - git [platform:rpm]
+  - git-core [platform:rpm]
   - libcurl-devel [platform:rpm]
   - systemd-devel [platform:rpm]
   - gcc [platform:rpm]
@@ -41,46 +41,40 @@ ee_bindep:
   - libxml2-devel [platform:rpm]
   - libxslt-devel [platform:rpm]
 ee_python:
-  - scp
-  - pyats
-  - genie
   - python-jenkins
 ee_collections:
-  - name: ansible.windows
-  - name: community.windows
-  - name: microsoft.ad
+  - name: amazon.aws
+  - name: ansible.controller
+  - name: ansible.eda
+  - name: ansible.hub
   - name: ansible.posix
-  - name: vmware.vmware_rest
-    version: 1.0.1
-  - name: ansible.netcommon
+  - name: ansible.platform
   - name: ansible.utils
+  - name: ansible.windows
+  - name: azure.azcollection
+  - name: cloud.terraform
+  - name: community.postgresql
   - name: community.crypto
   - name: community.general
+  - name: community.hashi_vault
   - name: community.vmware
-  - name: cloud.terraform
-  - name: servicenow.itsm
-  - name: vyos.vyos
-  - name: cisco.ios
-  - name: arista.eos
-  - name: azure.azcollection
-  - name: f5networks.f5_modules
-  - name: netscaler.adc
-  - name: shadowman.reports
-  - name: redhat.rhv
-  - name: redhat.satellite
-  - name: redhat.insights
-  - name: ansible.controller
-  - name: ansible.hub
-  - name: ansible.eda
-  - name: ansible.platform
-  - name: infra.aap_configuration
-  - name: paloaltonetworks.panos
-  - name: ibm.qradar
+  - name: community.windows
   - name: containers.podman
-  - name: community.postgresql
-  - name: redhat.openshift
   - name: datadog.dd
   - name: dynatrace.oneagent
+  - name: hashicorp.terraform
+  - name: ibm.qradar
+  - name: infra.aap_configuration
+  - name: microsoft.ad
+  - name: microsoft.iis
+  - name: paloaltonetworks.panos
+  - name: redhat.insights
+  - name: redhat.openshift
+  - name: redhat.openshift_virtualization
+  - name: redhat.satellite
+  - name: servicenow.itsm
+  - name: shadowman.reports
+  - name: vmware.vmware_rest
 # ee_prepend_base:
 #   - RUN microdnf upgrade -y
 # ee_python_interpreter:
@@ -89,19 +83,18 @@ ee_collections:
 ee_prepend_galaxy:
   - ADD _build/configs/ansible.cfg /etc/ansible/ansible.cfg
 ee_prepend_builder:
-  - ENV PKGMGR_OPTS "--nodocs --setopt install_weak_deps=0 --enablerepo=rhocp-4.13-for-rhel-8-x86_64-rpms"
-#  - ENV PKGMGR_OPTS "--nodocs --setopt install_weak_deps=0 --enablerepo=rhocp-4.13-for-rhel-8-x86_64-rpms --disablerepo=ubi-8-baseos-rpms --disablerepo=ubi-8-appstream-rpms"
+  - ENV PKGMGR_OPTS "--nodocs --setopt install_weak_deps=0 --enablerepo=rhocp-4.17-for-rhel-8-x86_64-rpms"
+#  - ENV PKGMGR_OPTS "--nodocs --setopt install_weak_deps=0 --enablerepo=rhocp-4.17-for-rhel-8-x86_64-rpms --disablerepo=ubi-8-baseos-rpms --disablerepo=ubi-8-appstream-rpms --disablerepo=ubi-8-codeready-builder-rpms-8-x86_64"
 ee_prepend_final:
-  - ENV PKGMGR_OPTS "--nodocs --setopt install_weak_deps=0 --enablerepo=rhocp-4.13-for-rhel-8-x86_64-rpms"
-#  - ENV PKGMGR_OPTS "--nodocs --setopt install_weak_deps=0 --enablerepo=rhocp-4.13-for-rhel-8-x86_64-rpms --disablerepo=ubi-8-baseos-rpms --disablerepo=ubi-8-appstream-rpms"
+  - ENV PKGMGR_OPTS "--nodocs --setopt install_weak_deps=0 --enablerepo=rhocp-4.17-for-rhel-8-x86_64-rpms"
+#  - ENV PKGMGR_OPTS "--nodocs --setopt install_weak_deps=0 --enablerepo=rhocp-4.17-for-rhel-8-x86_64-rpms --disablerepo=ubi-8-baseos-rpms --disablerepo=ubi-8-appstream-rpms --disablerepo=ubi-8-codeready-builder-rpms-8-x86_64"
 ee_append_final:
-#  - ENV PKGMGR_OPTS "--nodocs --setopt install_weak_deps=0 --enablerepo=rhocp-4.13-for-rhel-8-x86_64-rpms --disablerepo=ubi-8-baseos-rpms --disablerepo=ubi-8-appstream-rpms"
+#  - ENV PKGMGR_OPTS "--nodocs --setopt install_weak_deps=0 --enablerepo=rhocp-4.17-for-rhel-8-x86_64-rpms --disablerepo=ubi-8-baseos-rpms --disablerepo=ubi-8-appstream-rpms --disablerepo=ubi-8-codeready-builder-rpms-8-x86_64"
 #  - RUN dnf config-manager --disable *ubi*
   - COPY _build/certs/shadowman_cert.cer /certs/shadowman_cert.cer
   - COPY _build/certs/shadowman_private.key /certs/shadowman_private.key
   - COPY _build/certs/certificate.pfx /certs/certificate.pfx
   - COPY _build/certs/service-ca-cert.crt /certs/service-ca-cert.crt
-  - RUN $PYCMD -m pip install --no-cache-dir --upgrade 'ansible-core<2.17.0' # added because of netscalar.adc
   - RUN microdnf reinstall tzdata -y
   - RUN rm -f /etc/ansible/ansible.cfg
   - RUN microdnf clean all

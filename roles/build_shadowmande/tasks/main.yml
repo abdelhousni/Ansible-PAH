@@ -46,7 +46,7 @@
 
 - name: Build new EE with container signature verification on version 2 or 3
   ansible.builtin.command:
-    cmd: 'ansible-builder build -t {{ pah_name }}/{{ image_name }} --prune-images --galaxy-keyring={{ galaxy_keyring }} --container-policy=system'
+    cmd: 'ansible-builder build -t {{ pah_name }}/{{ image_name }} --prune-images --galaxy-keyring={{ galaxy_keyring }} --container-policy=system --squash=new'
     chdir: "{{ dest_dir }}"
   changed_when: true
   when: ee_version == 2 or ee_version == 3
@@ -85,6 +85,13 @@
     name: "{{ ee_base_image }}"
     state: absent
     force: true
+
+- name: Update Decision Environment Version in EDA with new version
+  ansible.eda.decision_environment:
+    name: "Shadowman DE"
+    organization_name: Infrastructure
+    image_url: "{{ pah_name }}/{{ image_name }}:{{ ansible_date_time.iso8601_basic_short }}"
+  delegate_to: localhost
 
 - name: Get all current Execution Environment Images
   ansible.builtin.uri:

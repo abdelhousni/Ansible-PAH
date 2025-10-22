@@ -46,7 +46,7 @@
 
 - name: Build new EE with container signature verification on version 2 or 3
   ansible.builtin.command:
-    cmd: 'ansible-builder build -t {{ pah_name }}/{{ image_name }} --prune-images --galaxy-keyring={{ galaxy_keyring }} --container-policy=system'
+    cmd: 'ansible-builder build -t {{ pah_name }}/{{ image_name }} --prune-images --galaxy-keyring={{ galaxy_keyring }} --container-policy=system --squash=new'
     chdir: "{{ dest_dir }}"
   changed_when: true
   when: ee_version == 2 or ee_version == 3
@@ -81,6 +81,8 @@
     push: true
     username: "{{ pah_user }}"
     password: "{{ pah_pass }}"
+    build:
+      extra_args: "--squash"
 
 - name: Create new tag on devee based on date time of creation
   containers.podman.podman_tag:
@@ -95,6 +97,10 @@
     push: true
     username: "{{ pah_user }}"
     password: "{{ pah_pass }}"
+  register: podmandeveetime_output
+  retries: 10
+  delay: 1
+  until: podmandeveetime_output.stderr is not defined
 
 - name: Remove extra tag from dev EE
   containers.podman.podman_image:
@@ -136,8 +142,8 @@
     image: "{{ pah_name }}/{{ image_name }}:{{ ansible_date_time.iso8601_basic_short }}"
   delegate_to: localhost
 
-- name: Create repo in Private Automation Hub
-  ansible.builtin.include_tasks: create_repo.yml
+# - name: Create repo in Private Automation Hub
+#   ansible.builtin.include_tasks: create_repo.yml
 
 - name: Delete completed EE to free space
   containers.podman.podman_image:

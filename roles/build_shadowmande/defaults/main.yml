@@ -1,15 +1,17 @@
 ---
 ee_version: 3
 dest_dir: /home/ansible/ansible/builder/shadowmande/
-pah_name: tower.shadowman.dev
+pah_name: aap.shadowman.dev
 image_name: shadowmande
 bindep_file: bindep.txt
 python_requirements_file: requirements.txt
 galaxy_requirements_file: requirements.yml
-ee_base_image: tower.shadowman.dev/ansible-automation-platform-25/de-minimal-rhel8:latest
-ee_base_sig_name: registry.redhat.io/ansible-automation-platform-25/de-minimal-rhel8:latest
+ee_base_image: aap.shadowman.dev/ansible-automation-platform-26/de-minimal-rhel9:latest
+ee_base_sig_name: registry.redhat.io/ansible-automation-platform-26/de-minimal-rhel9:latest
 galaxy_keyring: /certs/fullkeyring.kbx
 ee_package_manager_path: /usr/bin/microdnf
+ee_python_interpreter:
+  python_path: "/usr/bin/python3.11"
 ee_build_files:
   - src: /home/ansible/ansible/builder/shadowmande/ansible.cfg
     dest: configs
@@ -18,14 +20,15 @@ ee_bindep:
   - systemd-devel [platform:rpm]
   - gcc [platform:rpm]
   - python3.11-devel [platform:rpm]
-  # if using RHEL9 DE use - python3-devel [platform:rpm]
 ee_collections:
   - name: ansible.eda
-  - name: redhat.insights_eda
   - name: dynatrace.event_driven_ansible
+  - name: juniper.eda
+  - name: redhat.insights_eda
+  - name: servicenow.itsm
 ee_prepend_galaxy:
   - ADD _build/configs/ansible.cfg /etc/ansible/ansible.cfg
 ee_append_final:
   - RUN rm -f /etc/ansible/ansible.cfg
   # Temporary fix due to DE issue
-  - ENV PYTHONPATH=$PYTHONPATH:/usr/local/lib/python3.11/site-packages:/usr/local/lib64/python3.11/site-packages
+  # - ENV PYTHONPATH=$PYTHONPATH:/usr/local/lib/python3.11/site-packages:/usr/local/lib64/python3.11/site-packages

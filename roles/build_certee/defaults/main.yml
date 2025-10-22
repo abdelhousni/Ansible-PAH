@@ -1,31 +1,27 @@
 ---
 ee_version: 3
-dest_dir: /home/ansible/ansible/builder/creation/
+dest_dir: /home/ansible/ansible/builder/certee/
 pah_name: aap.shadowman.dev
-image_name: shadowmancreationee
-bindep_file: bindep.txt
+image_name: certee
 galaxy_requirements_file: requirements.yml
 ee_base_image: aap.shadowman.dev/ansible-automation-platform/ee-minimal-rhel8:2.16
 ee_base_sig_name: registry.redhat.io/ansible-automation-platform/ee-minimal-rhel8:2.16
 galaxy_keyring: /certs/fullkeyring.kbx
 ee_package_manager_path: /usr/bin/microdnf
 ee_build_files:
-  - src: /home/ansible/ansible/builder/creation/ansible.cfg
+  - src: /home/ansible/ansible/builder/certee/ansible.cfg
     dest: configs
-ee_bindep:
-  - pkgconf-pkg-config [platform:rpm]
-  - systemd-devel [platform:rpm]
-  - gcc [platform:rpm]
-  - python3.11-devel [platform:rpm]
 ee_collections:
-  - name: ansible.controller
-  - name: ansible.eda
-  - name: ansible.hub
-  - name: ansible.platform
-  - name: containers.podman
-  - name: infra.aap_configuration
-  - name: infra.ee_utilities
+  - name: ansible.posix
+  - name: ansible.windows
+  - name: community.windows
+  - name: microsoft.iis
+  - name: venafi.machine_identity
+  - name: community.crypto
+  - name: community.hashi_vault
 ee_prepend_galaxy:
   - ADD _build/configs/ansible.cfg /etc/ansible/ansible.cfg
 ee_append_final:
+  - RUN $PYCMD -m pip install --no-cache-dir --upgrade vcert
   - RUN rm -f /etc/ansible/ansible.cfg
+  - RUN microdnf clean all
