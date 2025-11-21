@@ -25,7 +25,7 @@
     registry: "{{ pah_name }}"
   when: ee_version == 2 or ee_version == 3
 
-- name: Delete old DE
+- name: Delete old EE
   containers.podman.podman_image:
     name: "{{ pah_name }}/{{ image_name }}"
     state: absent
@@ -40,10 +40,9 @@
     mode: '0644'
   loop:
     - ansible.cfg
-    - bindep.txt
     - execution-environment.yml
-    - requirements.txt
     - requirements.yml
+    # - requirements.txt
 
 - name: Build new EE on version 1 without signature verification
   ansible.builtin.command:
@@ -59,13 +58,13 @@
   changed_when: true
   when: ee_version == 2 or ee_version == 3
 
-- name: Create new tag on DE based on date time of creation
+- name: Create new tag on EE based on date time of creation
   containers.podman.podman_tag:
     image: "{{ pah_name }}/{{ image_name }}"
     target_names:
       - "{{ pah_name }}/{{ image_name }}:{{ ansible_date_time.iso8601_basic_short }}"
 
-- name: Push new DE
+- name: Push new EE
   containers.podman.podman_image:
     name: "{{ pah_name }}/{{ image_name }}"
     tag: "{{ item }}"
@@ -82,24 +81,17 @@
     tag: "{{ ansible_date_time.iso8601_basic_short }}"
     state: absent
 
-- name: Delete completed DE to free space
+- name: Update Execution Environment Version in Controller with new version
+  ansible.controller.execution_environment:
+    name: "Automation Hub Shadowman Security EE"
+    image: "{{ pah_name }}/{{ image_name }}:{{ ansible_date_time.iso8601_basic_short }}"
+  delegate_to: localhost
+
+- name: Delete completed EE to free space
   containers.podman.podman_image:
     name: "{{ pah_name }}/{{ image_name }}"
     state: absent
     force: true
-
-- name: Delete base DE to free space
-  containers.podman.podman_image:
-    name: "{{ ee_base_image }}"
-    state: absent
-    force: true
-
-- name: Update Decision Environment Version in EDA with new version
-  ansible.eda.decision_environment:
-    name: "Shadowman DE"
-    organization_name: Infrastructure
-    image_url: "{{ pah_name }}/{{ image_name }}:{{ ansible_date_time.iso8601_basic_short }}"
-  delegate_to: localhost
 
 - name: Get all current Execution Environment Images
   ansible.builtin.uri:
